@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 import datetime
+import re
 
 # Twitter API credentials
 consumer_api_key = os.getenv("PIADA_KEY")
@@ -19,7 +20,11 @@ auth.set_access_token(access_token, access_token_secret)
 
 client = tweepy.Client(consumer_key= consumer_api_key,consumer_secret= consumer_secret_key,
                        access_token= access_token,
-                       access_token_secret= access_token_secret)
+                       access_token_secret= access_token_secret, bearer_token= consumer_token)
+
+
+user = client.get_user(username='Piada_stakePool')
+user_id = user.data['id']
 
 
 api = tweepy.API(auth)
@@ -64,7 +69,7 @@ def convert_posix_time(posix_time):
     return time_string
 
 def check_valid_range(posix_time):
-    valid_range = range(posix_time, posix_time + 90)
+    valid_range = range(posix_time, posix_time + 18000)
     current_time = int(datetime.datetime.now().timestamp())
     if current_time in valid_range:
             return True
@@ -77,7 +82,13 @@ def find_word(text, search):
    if len(result)>0:
       return True
    else:
-      return False    
+      return False
+
+def find_pattern(pattern, text):
+        if re.search(pattern, text):
+                return True
+        else:
+                return False
 
     
 def tweet_with_media(text, filename, media_category):
@@ -91,37 +102,37 @@ def tweet_with_media(text, filename, media_category):
         here = os.path.dirname(os.path.abspath('__file__'))
         media_filename = os.path.join(here, filename)
         
+
         # Check that the last tweet made is not the same as the current one
         # If it is the same then we do not want to make a new tweet
         # If it is not the same then we want to make a new tweet
+        tweets = client.get_users_tweets(id=user_id)
+        tweets_text = [text.data['text'] for text in tweets.data]
+        
+        if check_valid_range(posix_time):
+                for tweet in tweets_text:
+                        if find_pattern(r"Epoch:\s*" + str(summary_epoch), tweet):
+                                print("We have already made a post for this epoch")
+                                return
+                # get chunked media for twitter API upload
+                chunked_media = api.chunked_upload(filename=media_filename, media_category=media_category)
+        
+                # If upload of data successful we will have a media_id
+                print(chunked_media.media_id)
+        
+        
+                # update status with our text and media and print the tweet id
+                update_status = client.create_tweet(text=text, media_ids=[chunked_media.media_id])
+                
+text = f"""
+PIADA Epoch's end Summary:
+Epoch: {summary_epoch}
+Active Stake: {format(piada_summary_epoch['active_stake'][0].round(2), ',')} ADA 👩‍🚀
+Total Blocks Forged: {piada_summary_epoch['block_cnt'][0]} 🧱
+Total Delegate Rewards: {piada_summary_epoch['deleg_rewards'][0]} ADA 🤑
+Total Fees: {piada_summary_epoch['pool_fees'][0]} ADA 💸
+Epoch ROA: {piada_summary_epoch['epoch_ros'][0]}% 📈
+"""
 
-        # get the last tweet made
-        last_ten_tweets = client.get_home_timeline()
-        recent_tweet = last_ten_tweets.data[0].text
-        recent_tweet = recent_tweet.strip()
-        
-        if find_word(recent_tweet, str(summary_epoch)):
-                print("Tweet already made")
-                return
-               
-        
-        # get chunked media for twitter API upload
-        chunked_media = api.chunked_upload(filename=media_filename, media_category=media_category)
-        
-        # If upload of data successful we will have a media_id
-        print(chunked_media.media_id)
-        
-        # update status with our text and media and print the tweet id
-        update_status = client.create_tweet(text=text, media_ids=[chunked_media.media_id])
-        
-if check_valid_range(posix_time) == True:
-        text = f"""Epoch's end Summary:
-        Epoch: {summary_epoch}
-	Active Stake: {format(piada_summary_epoch['active_stake'][0].round(2), ',')} ADA 👩‍🚀
-	Total Blocks Forged: {piada_summary_epoch['block_cnt'][0]} 🧱
-	Total Delegate Rewards: {piada_summary_epoch['deleg_rewards'][0]} ADA 🤑
-	Total Fees: {piada_summary_epoch['pool_fees'][0]} ADA 💸
-	Epoch ROA: {piada_summary_epoch['epoch_ros'][0]}% 📈
-	"""
-        tweet_with_media(text, 'aalogo.gif', 'tweet_gif')
+tweet_with_media(text, 'PIADA0_thumbnail.png', 'tweet_image')
         
