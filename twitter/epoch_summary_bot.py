@@ -69,7 +69,7 @@ def convert_posix_time(posix_time):
     return time_string
 
 def check_valid_range(posix_time):
-    valid_range = range(posix_time, posix_time + 18000)
+    valid_range = range(posix_time, posix_time + 1800)
     current_time = int(datetime.datetime.now().timestamp())
     if current_time in valid_range:
             return True
@@ -132,7 +132,8 @@ Total Blocks Forged: {piada_summary_epoch['block_cnt'][0]} 🧱
 Total Delegate Rewards: {piada_summary_epoch['deleg_rewards'][0]} ADA 🤑
 Total Fees: {piada_summary_epoch['pool_fees'][0]} ADA 💸
 Epoch ROA: {piada_summary_epoch['epoch_ros'][0]}% 📈
+Web Site: https://piada.io 🌐
+Pool Stats: https://cexplorer.io/pool/pool1hrv8gtrm0dgjg6zyss5uwa4nkruzfnh5vrdkr2sayj7x2nw6mjc 📊
 """
 
-tweet_with_media(text, 'PIADA0_thumbnail.png', 'tweet_image')
-        
+tweet_with_media(text, 'PIADA0_thumbnail.png', 'tweet_image') 
