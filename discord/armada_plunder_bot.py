@@ -80,75 +80,8 @@ def get_stake_pool_data(hex_pool_id):
 pool_data_df = get_stake_pool_data(stake_pools_no_extensions)
 armada_pool_ids = list(pool_data_df.pool_id)
 
-
-
-# Let's get the data from our list of pools by pool id
-
-# def query_tip():
-#         pd_chain_tip = pd.DataFrame()
-#         url = "https://api.koios.rest/api/v0/tip"
-#         response = requests.get(url)
-#         print(response.status_code)
-#         if response.status_code == 200:
-#                 chain_tip = response.json()
-#                 pd_chain_tip = pd.DataFrame(chain_tip)
-#                 return pd_chain_tip
-        
-#         return response.status_code
-
 df_tip = kp.get_tip()
 
-
-# Look up latest block information
-# Look Up information about specific Blocks made by a pool
-
-# def get_block_info(block_hash_list, content_range="0-999"):
-        
-        
-#         data_payload = {"_block_hashes": block_hash_list}
-#         headers = {'Range': content_range}
-#         reqs = requests.post('https://api.koios.rest/api/v0/block_info', headers=headers, json=data_payload)
-#         print(reqs.status_code)
-#         if reqs.status_code == 200:
-#                 block_info = reqs.json()
-#                 pd_block_info = pd.DataFrame(block_info)
-#                 return pd_block_info
-
-#         return reqs.status_code
-
-
-# Get the latest blocks list
-# def get_block_list(content_range="0-999"):
-        
-        
-#         headers = {'Range': content_range}
-#         reqs = requests.get('https://api.koios.rest/api/v0/blocks', headers=headers)
-#         print(reqs.status_code)
-#         if reqs.status_code == 200:
-#                 block_info = reqs.json()
-#                 pd_block_info = pd.DataFrame(block_info)
-#                 return pd_block_info
-
-#         return reqs.status_code
-
-
-# Get Pool info by pool id
-
-# def get_pool_info(pool_list, content_range="0-999"):
-        
-#         # if type(pool_list) == pd.DataFrame:
-#         #     pool_list = pool_list.pool_id_bech32.tolist()
-        
-#         data_payload = {"_pool_bech32_ids": pool_list}
-#         headers = {'Range': content_range}
-#         reqs = requests.post('https://api.koios.rest/api/v0/pool_info', headers=headers, json=data_payload)
-#         print(reqs.status_code)
-#         if reqs.status_code == 200:
-#                 pool_info = reqs.json()
-#                 pd_pool_info = pd.DataFrame(pool_info)
-#                 return pd_pool_info
-
-#         return reqs.status_code
 
 armada_pools_df = pd.DataFrame(kp.get_pool_info(armada_pool_ids))
 
